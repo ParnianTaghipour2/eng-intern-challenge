@@ -18,15 +18,17 @@ digitToBraille = {
     "6": "OOO...", "7": "OOOO..", "8": "O.OO..", "9": ".OO...", "0": ".OOO.."
 }
 
-brailleToDigit = {v: k for k, v in digitToBraille.items()}
-brailleMapping = {v: k for k, v in MAPPING.items()}
+brailleToDigit = {digitB: digit for digit, digitB in digitToBraille.items()}
+brailleMapping = {charB: char for char, charB in MAPPING.items()}
 
 def isBraille(s):
     return set(s) <= {"O", "."} and len(s) % 6 == 0 # Braille property is it should have 6 letter
 
+# This fucnction handle Braille to English!
+# for ( ) need to put \ before the char in the input#
 def brailleToText(braille):
     words = [braille[i:i + 6] for i in range(0, len(braille), 6)]
-    text, numberMode, capitalNext = [], False, False
+    text, numberNext, capitalNext = [], False, False
 
     for word in words:
         if word == MAPPING["capitalNext"]:
@@ -34,19 +36,20 @@ def brailleToText(braille):
         elif word == MAPPING["decimalNext"]:
             text.append(".")
         elif word == MAPPING["numberNext"]:
-            numberMode = True
+            numberNext = True
         else:
-            if numberMode and word != MAPPING[" "]:
+            if numberNext and word != MAPPING[" "]:
                 char = brailleToDigit.get(word, " ")
             else:
                 char = brailleMapping.get(word, " ")
-                numberMode = False
+                numberNext = False
                 if capitalNext:
                     char = char.upper()
                     capitalNext = False
             text.append(char)
     return "".join(text)
 
+# This fucnction handle English to Braille!
 def textToBraille(text):
     braille = []
     for char in text:
@@ -54,7 +57,7 @@ def textToBraille(text):
             braille.append(MAPPING["capitalNext"])
             braille.append(MAPPING[char.lower()])
         elif char.isdigit():
-            if not braille or braille[-1] != MAPPING["numberNext"]:
+            if len(braille) == 0 or braille[-1] != MAPPING["numberNext"]:
                 braille.append(MAPPING["numberNext"])
             braille.append(digitToBraille[char])
         elif char == ".":
@@ -69,7 +72,7 @@ def main():
         result = brailleToText(inputStr) if isBraille(inputStr) else textToBraille(inputStr)
         print(result)
     else:
-        print("Please provide the Input. Run the code using Python3 translator.py")
+        print("You forgot the input!")
 
 if __name__ == "__main__":
 
